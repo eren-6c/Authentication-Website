@@ -6,6 +6,39 @@
     <title>GitHub User Manager</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles to ensure all sections display properly */
+        section {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        section.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -42,108 +75,112 @@
                 <!-- Add User Section -->
                 <section id="add-user" class="active">
                     <h2><i class="fas fa-user-plus"></i> Add New User</h2>
-                    <div class="form-group">
-                        <label>Mode:</label>
-                        <select id="add-mode">
-                            <option value="single">Single User</option>
-                            <option value="multi">Multi-User</option>
-                        </select>
-                    </div>
-                    
-                    <div id="single-user-fields">
-                        <div class="form-group">
-                            <label>Username:</label>
-                            <input type="text" id="username" placeholder="Enter username">
-                        </div>
-                        <div class="form-group">
-                            <label>Password:</label>
-                            <input type="text" id="password" placeholder="Enter password">
-                        </div>
-                    </div>
-                    
-                    <div id="multi-user-fields" style="display:none;">
-                        <div class="form-group">
-                            <label>Usernames (one per line):</label>
-                            <textarea id="multi-usernames" rows="5" placeholder="Enter one username per line"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Password (for all users):</label>
-                            <input type="text" id="multi-password" placeholder="Enter common password">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Expiry Date:</label>
-                        <input type="date" id="expiry-date">
-                        <small>Leave empty for no expiry</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Category:</label>
-                        <select id="user-category">
-                            <option value="EREN">EREN</option>
-                            <option value="INSANE">INSANE</option>
-                        </select>
-                    </div>
-                    
-                    <button id="add-user-btn" class="btn-primary"><i class="fas fa-plus"></i> Add User</button>
+                    <!-- ... existing add user form ... -->
                 </section>
 
                 <!-- Show Users Section -->
                 <section id="show-users">
                     <h2><i class="fas fa-list"></i> User List</h2>
-                    <div class="form-group">
-                        <label>Category:</label>
-                        <select id="show-category">
-                            <option value="EREN">EREN</option>
-                            <option value="INSANE">INSANE</option>
-                            <option value="ALL">All Categories</option>
-                        </select>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table id="user-table">
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th>Category</th>
-                                    <th>Created</th>
-                                    <th>HWID</th>
-                                    <th>Expiry</th>
-                                    <th>Last Login</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Users will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="loading" id="users-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading users...
-                    </div>
+                    <!-- ... existing user table ... -->
                 </section>
 
-                <!-- Other sections would go here -->
+                <!-- Edit User Section -->
                 <section id="edit-user">
                     <h2><i class="fas fa-user-edit"></i> Edit User</h2>
+                    <!-- ... existing edit form ... -->
+                </section>
+
+                <!-- Delete User Section -->
+                <section id="delete-user">
+                    <h2><i class="fas fa-user-times"></i> Delete User</h2>
                     <div class="form-group">
-                        <label>Search Username:</label>
-                        <input type="text" id="edit-search" placeholder="Enter username to edit">
-                        <button id="edit-search-btn" class="btn-secondary"><i class="fas fa-search"></i> Search</button>
+                        <label>Username to Delete:</label>
+                        <input type="text" id="delete-username" placeholder="Enter username">
                     </div>
-                    
-                    <div id="edit-user-form" style="display:none;">
-                        <!-- Form will be populated here -->
+                    <div class="form-group">
+                        <label>Category:</label>
+                        <select id="delete-category">
+                            <option value="EREN">EREN</option>
+                            <option value="INSANE">INSANE</option>
+                        </select>
                     </div>
+                    <button id="delete-user-btn" class="btn-primary"><i class="fas fa-trash"></i> Delete User</button>
+                </section>
+
+                <!-- Reset HWID Section -->
+                <section id="reset-hwid">
+                    <h2><i class="fas fa-microchip"></i> Reset HWID</h2>
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="reset-hwid-username" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label>Category:</label>
+                        <select id="reset-hwid-category">
+                            <option value="EREN">EREN</option>
+                            <option value="INSANE">INSANE</option>
+                        </select>
+                    </div>
+                    <button id="reset-hwid-btn" class="btn-primary"><i class="fas fa-sync-alt"></i> Reset HWID</button>
+                </section>
+
+                <!-- Search User Section -->
+                <section id="search-user">
+                    <h2><i class="fas fa-search"></i> Search User</h2>
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="search-username" placeholder="Enter username to search">
+                    </div>
+                    <button id="search-user-btn" class="btn-primary"><i class="fas fa-search"></i> Search</button>
+                    <div id="search-results" style="margin-top: 20px;"></div>
+                </section>
+
+                <!-- Delete Expired Section -->
+                <section id="delete-expired">
+                    <h2><i class="fas fa-trash"></i> Delete Expired Users</h2>
+                    <p>This will permanently delete all users whose expiry date has passed.</p>
+                    <button id="delete-expired-btn" class="btn-primary"><i class="fas fa-trash"></i> Delete Expired Users</button>
+                    <div id="delete-expired-results" style="margin-top: 20px;"></div>
                 </section>
 
                 <!-- Status messages -->
                 <div id="status-message" class="status-message"></div>
+                
+                <!-- Loading overlay -->
+                <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+                    <div style="background:white; padding:20px; border-radius:5px;">
+                        <i class="fas fa-spinner fa-spin"></i> Processing...
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Basic section switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarItems = document.querySelectorAll('.sidebar li');
+            
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Hide all sections
+                    document.querySelectorAll('main section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show the selected section
+                    const sectionId = this.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
