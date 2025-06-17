@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const sidebarItems = document.querySelectorAll('.sidebar li');
@@ -16,8 +15,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Edit User Elements
     const editSearchInput = document.getElementById('edit-search');
+    const editSearchCategory = document.getElementById('edit-search-category');
     const editSearchBtn = document.getElementById('edit-search-btn');
     const editUserForm = document.getElementById('edit-user-form');
+    const editUsernameDisplay = document.getElementById('edit-username-display');
+    const editUsername = document.getElementById('edit-username');
+    const editOriginalCategory = document.getElementById('edit-original-category');
+    const editPassword = document.getElementById('edit-password');
+    const editCategory = document.getElementById('edit-category');
+    const editExpiryDate = document.getElementById('edit-expiry-date');
+    const editResetHwid = document.getElementById('edit-reset-hwid');
+    const editLoginMessage = document.getElementById('edit-login-message');
+    const saveEditBtn = document.getElementById('save-edit-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
 
     // Delete User Elements
     const deleteUsernameInput = document.getElementById('delete-username');
@@ -63,6 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
     addModeSelect.addEventListener('change', toggleAddMode);
     addUserBtn.addEventListener('click', addUser);
     editSearchBtn.addEventListener('click', searchUserForEdit);
+    saveEditBtn.addEventListener('click', saveEditedUser);
+    cancelEditBtn.addEventListener('click', cancelEdit);
     deleteUserBtn.addEventListener('click', deleteUser);
     resetHwidBtn.addEventListener('click', resetHwid);
     showCategorySelect.addEventListener('change', loadUsers);
@@ -155,7 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 users = usernamesText.split('\n').map(u => u.trim()).filter(u => u).map(username => ({ username, password }));
             }
 
-            const result = await apiRequest('addUsers', { category, expiryDate, users });
+            const result = await apiRequest('addUsers', { 
+                category, 
+                expiryDate, 
+                users,
+                loginMessage: "🚫 N32 Emulator is currently triggering bans in Free Fire.\n✅ P64 Emulator is safe and not causing bans.\n\n🛡️ We strongly recommend switching to P64 for a safer experience."
+            });
+            
             if (result) {
                 showStatus(`${users.length} user(s) added to ${category}!`, 'success');
                 if (mode === 'single') {
@@ -175,60 +193,77 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function searchUserForEdit() {
         const username = editSearchInput.value.trim();
+        const category = editSearchCategory.value;
+        
         if (!username) {
             showStatus('Please enter a username', 'error');
             return;
         }
 
-        const result = await apiRequest('searchUser', { username });
+        const result = await apiRequest('searchUser', { username, category });
         if (result?.user) {
-            editUserForm.innerHTML = `
-                <div class="form-group">
-                    <label>Username:</label>
-                    <input type="text" id="edit-username" value="${result.user.username}" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Category:</label>
-                    <input type="text" id="edit-category" value="${result.user.category}" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Password:</label>
-                    <input type="text" id="edit-password" value="${result.user.password}">
-                </div>
-                <div class="form-group">
-                    <label>HWID:</label>
-                    <input type="text" id="edit-hwid" value="${result.user.hwid || ''}">
-                </div>
-                <div class="form-group">
-                    <label>Expiry Date:</label>
-                    <input type="text" id="edit-expiry" value="${result.user.expiryDate || ''}">
-                </div>
-                <button id="save-edit-btn" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
-            `;
+            // Populate the edit form
+            editUsername.value = result.user.username;
+            editUsernameDisplay.textContent = result.user.username;
+            editOriginalCategory.value = result.user.category;
+            editPassword.value = result.user.password || '';
+            editCategory.value = result.user.category;
+            editExpiryDate.value = result.user.expiryDate?.split('T')[0] || '';
+            editLoginMessage.value = result.user.loginMessage || '';
+            
+            // Show the edit form
             editUserForm.style.display = 'block';
-            document.getElementById('save-edit-btn').addEventListener('click', saveEditedUser);
+            
+            showStatus('User found and loaded for editing', 'success');
+        } else {
+            showStatus('User not found', 'error');
         }
     }
 
     async function saveEditedUser() {
-        const username = document.getElementById('edit-username').value;
-        const category = document.getElementById('edit-category').value;
-        const password = document.getElementById('edit-password').value;
-        const hwid = document.getElementById('edit-hwid').value;
-        const expiryDate = document.getElementById('edit-expiry').value;
+        const username = editUsername.value;
+        const originalCategory = editOriginalCategory.value;
+        const newCategory = editCategory.value;
+        const password = editPassword.value;
+        const expiryDate = editExpiryDate.value;
+        const resetHwid = editResetHwid.value === 'yes';
+        const loginMessage = editLoginMessage.value;
+
+        if (!username || !password) {
+            showStatus('Username and password are required', 'error');
+            return;
+        }
+
+        const updates = {
+            password,
+            expiryDate: expiryDate || 'No Expiry',
+            loginMessage
+        };
+
+        // Only include these if they're being changed
+        if (newCategory !== originalCategory) {
+            updates.category = newCategory;
+        }
+        if (resetHwid) {
+            updates.hwid = null;
+        }
 
         const result = await apiRequest('editUser', {
             username,
-            category,
-            updates: { password, hwid, expiryDate }
+            originalCategory,
+            updates
         });
 
         if (result) {
             showStatus('User updated successfully!', 'success');
-            editUserForm.style.display = 'none';
-            editSearchInput.value = '';
+            cancelEdit();
             if (document.querySelector('#show-users').classList.contains('active')) loadUsers();
         }
+    }
+
+    function cancelEdit() {
+        editUserForm.style.display = 'none';
+        editSearchInput.value = '';
     }
 
     async function deleteUser() {
@@ -276,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${user.username}</td>
                     <td>${user.category}</td>
                     <td>${user.creationDate || 'N/A'}</td>
-                    <td>${user.hwid || 'Not set'}</td>
+                    <td>${user.hwid ? user.hwid.substring(0, 8) + '...' : 'Not set'}</td>
                     <td>${user.expiryDate || 'No expiry'}</td>
                     <td>${user.lastUsed || 'Never'}</td>
                 </tr>
@@ -294,13 +329,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = await apiRequest('searchUser', { username });
         if (result?.user) {
             searchResultsDiv.innerHTML = `
-                <div style="background:#f8f9fa; padding:15px; border-radius:5px;">
+                <div class="user-card">
                     <h3>${result.user.username}</h3>
                     <p><strong>Category:</strong> ${result.user.category}</p>
                     <p><strong>Created:</strong> ${result.user.creationDate || 'N/A'}</p>
                     <p><strong>HWID:</strong> ${result.user.hwid || 'Not set'}</p>
                     <p><strong>Expiry:</strong> ${result.user.expiryDate || 'No expiry'}</p>
                     <p><strong>Last Login:</strong> ${result.user.lastUsed || 'Never'}</p>
+                    ${result.user.loginMessage ? `<div style="margin-top:15px; padding:10px; background:#f0f0f0; border-radius:5px; white-space:pre-line;"><strong>Login Message:</strong><br>${result.user.loginMessage}</div>` : ''}
                 </div>
             `;
         } else {
