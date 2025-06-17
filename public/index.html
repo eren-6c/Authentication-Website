@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Manager</title>
+    <title>Eren User Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -411,9 +411,9 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-database"></i>Eren User Manager</h1>
+            <h1><i class="fas fa-database"></i> Eren User Manager</h1>
             <div class="auth-section">
-                <input type="password" id="github-token" placeholder="Token" style="flex: 1;">
+                <input type="password" id="github-token" placeholder="GitHub Token" style="flex: 1;">
                 <button id="save-token" class="btn-primary"><i class="fas fa-save"></i> Save</button>
             </div>
         </header>
@@ -497,65 +497,13 @@
                             <label>Search Username:</label>
                             <input type="text" id="edit-search" placeholder="Enter username to edit">
                         </div>
-                        <div class="form-group" style="flex: 0 0 200px;">
-                            <label>Category:</label>
-                            <select id="edit-search-category">
-                                <option value="EREN">EREN</option>
-                                <option value="INSANE">INSANE</option>
-                            </select>
-                        </div>
                         <div class="form-group" style="align-self: flex-end;">
                             <button id="edit-search-btn" class="btn-primary"><i class="fas fa-search"></i> Search</button>
                         </div>
                     </div>
                     
                     <div id="edit-user-form" style="display:none; margin-top: 30px;">
-                        <div class="user-card">
-                            <h3>Edit User: <span id="edit-username-display"></span></h3>
-                            <input type="hidden" id="edit-username">
-                            <input type="hidden" id="edit-original-category">
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Password:</label>
-                                    <input type="text" id="edit-password" placeholder="Enter new password">
-                                </div>
-                                <div class="form-group">
-                                    <label>Category:</label>
-                                    <select id="edit-category">
-                                        <option value="EREN">EREN</option>
-                                        <option value="INSANE">INSANE</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Expiry Date:</label>
-                                    <input type="date" id="edit-expiry-date">
-                                </div>
-                                <div class="form-group">
-                                    <label>Reset HWID:</label>
-                                    <select id="edit-reset-hwid" style="height: 44px;">
-                                        <option value="no">Keep Current HWID</option>
-                                        <option value="yes">Reset HWID</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Login Message:</label>
-                                <textarea id="edit-login-message" rows="4" placeholder="Enter custom login message">🚫 N32 Emulator is currently triggering bans in Free Fire.
-✅ P64 Emulator is safe and not causing bans.
-
-🛡️ We strongly recommend switching to P64 for a safer experience.</textarea>
-                            </div>
-                            
-                            <div class="action-buttons">
-                                <button id="save-edit-btn" class="btn-primary"><i class="fas fa-save"></i> Save Changes</button>
-                                <button id="cancel-edit-btn" class="btn-secondary"><i class="fas fa-times"></i> Cancel</button>
-                            </div>
-                        </div>
+                        <!-- Form will be populated here -->
                     </div>
                 </section>
 
@@ -675,6 +623,7 @@
         </div>
     </div>
 
+    <script src="script.js"></script>
     <script>
         // Basic section switching functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -707,110 +656,6 @@
                 document.getElementById('multi-user-fields').style.display = 
                     mode === 'multi' ? 'block' : 'none';
             });
-
-            // Edit User Functionality
-            document.getElementById('edit-search-btn').addEventListener('click', function() {
-                const username = document.getElementById('edit-search').value.trim();
-                const category = document.getElementById('edit-search-category').value;
-                
-                if (!username) {
-                    showStatusMessage('Please enter a username to search', 'error');
-                    return;
-                }
-                
-                showLoading(true);
-                
-                // In a real implementation, you would fetch the user data from your API
-                // This is just a mock implementation
-                setTimeout(() => {
-                    showLoading(false);
-                    
-                    // Mock user data - replace with actual API call
-                    const mockUserData = {
-                        username: username,
-                        category: category,
-                        password: "1",
-                        hwid: "4C4C4544-0057-5710-8036-B5C04F4D5831",
-                        expiryDate: "2025-12-31",
-                        creationDate: "2025-03-12 00:24:07",
-                        lastUsed: "2025-06-16 09:06:44",
-                        loginMessage: "🚫 N32 Emulator is currently triggering bans in Free Fire.\n✅ P64 Emulator is safe and not causing bans.\n\n🛡️ We strongly recommend switching to P64 for a safer experience."
-                    };
-                    
-                    // Populate the edit form
-                    document.getElementById('edit-username').value = mockUserData.username;
-                    document.getElementById('edit-username-display').textContent = mockUserData.username;
-                    document.getElementById('edit-original-category').value = mockUserData.category;
-                    document.getElementById('edit-password').value = mockUserData.password;
-                    document.getElementById('edit-category').value = mockUserData.category;
-                    document.getElementById('edit-expiry-date').value = mockUserData.expiryDate;
-                    document.getElementById('edit-login-message').value = mockUserData.loginMessage;
-                    
-                    // Show the edit form
-                    document.getElementById('edit-user-form').style.display = 'block';
-                    
-                    showStatusMessage('User found and loaded for editing', 'success');
-                }, 1000);
-            });
-
-            // Save edited user
-            document.getElementById('save-edit-btn').addEventListener('click', function() {
-                const username = document.getElementById('edit-username').value;
-                const originalCategory = document.getElementById('edit-original-category').value;
-                const newCategory = document.getElementById('edit-category').value;
-                const password = document.getElementById('edit-password').value;
-                const expiryDate = document.getElementById('edit-expiry-date').value;
-                const resetHwid = document.getElementById('edit-reset-hwid').value === 'yes';
-                const loginMessage = document.getElementById('edit-login-message').value;
-                
-                if (!username || !password) {
-                    showStatusMessage('Username and password are required', 'error');
-                    return;
-                }
-                
-                showLoading(true);
-                
-                // In a real implementation, you would send this data to your API
-                setTimeout(() => {
-                    showLoading(false);
-                    
-                    // Show success message
-                    showStatusMessage('User updated successfully', 'success');
-                    
-                    // Hide the edit form
-                    document.getElementById('edit-user-form').style.display = 'none';
-                    
-                    // Clear search field
-                    document.getElementById('edit-search').value = '';
-                    
-                    // If category changed, we might want to refresh the user list if it's visible
-                    if (document.getElementById('show-users').classList.contains('active')) {
-                        // refreshUserList();
-                    }
-                }, 1000);
-            });
-
-            // Cancel edit
-            document.getElementById('cancel-edit-btn').addEventListener('click', function() {
-                document.getElementById('edit-user-form').style.display = 'none';
-                document.getElementById('edit-search').value = '';
-            });
-
-            // Utility functions
-            function showLoading(show) {
-                document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
-            }
-
-            function showStatusMessage(message, type) {
-                const statusElement = document.getElementById('status-message');
-                statusElement.textContent = message;
-                statusElement.className = 'status-message ' + type;
-                
-                // Hide the message after 5 seconds
-                setTimeout(() => {
-                    statusElement.className = 'status-message';
-                }, 5000);
-            }
         });
     </script>
 </body>
